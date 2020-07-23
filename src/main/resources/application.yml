@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://127.0.0.1:3306/security?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+
+# 解决pojo类中属性和表中字段名称因为_不对应的问题
+#解决找不到映射配置文件的问题
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 控制台日志配置,打印sql语句
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mappers/*.xml
+
+# 修改控制台的日志格式
+logging:
+  pattern:
+    console: "[%thread] %-5level %logger{36} -%msg%n"
