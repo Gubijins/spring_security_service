@@ -3,6 +3,7 @@ package com.gubijins.security.service;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.gubijins.security.dto.AclModuleLevelDto;
 import com.gubijins.security.dto.DeptLevelDto;
 import com.gubijins.security.mapper.SysAclMapper;
 import com.gubijins.security.mapper.SysAclModuleMapper;
@@ -28,6 +29,11 @@ public class SysTreeService {
     @Resource
     private SysAclModuleMapper sysAclModuleMapper;
 
+
+    /**
+     * 下面是部门的树形结构的
+     * @return
+     */
     public List<DeptLevelDto> deptTree() {
         List<SysDept> deptList = sysDeptMapper.getAllDept();
 
@@ -82,4 +88,53 @@ public class SysTreeService {
     }
 
     private static final Comparator<DeptLevelDto> deptSeqComparator = Comparator.comparingInt(SysDept::getSeq);
+
+
+    /**
+     * 下面是关于权限模块的树形结构的
+     * @return
+     */
+    public List<AclModuleLevelDto> aclModuleTree() {
+        List<SysAclModule> aclModuleList = sysAclModuleMapper.getAllAclModule();
+        List<AclModuleLevelDto> dtoList = Lists.newArrayList();
+        for (SysAclModule aclModule : aclModuleList) {
+            dtoList.add(AclModuleLevelDto.adapt(aclModule));
+        }
+        return aclModuleListToTree(dtoList);
+    }
+
+    public List<AclModuleLevelDto> aclModuleListToTree(List<AclModuleLevelDto> dtoList) {
+        if (CollectionUtils.isEmpty(dtoList)) {
+            return Lists.newArrayList();
+        }
+        Multimap<String, AclModuleLevelDto> levelAclModuleMap = ArrayListMultimap.create();
+        List<AclModuleLevelDto> rootList = Lists.newArrayList();
+
+        for (AclModuleLevelDto dto : dtoList) {
+            levelAclModuleMap.put(dto.getLevel(), dto);
+            if (LevelUtil.ROOT.equals(dto.getLevel())) {
+                rootList.add(dto);
+            }
+        }
+        rootList.sort(aclModuleSeqComparator);
+        transformAclModuleTree(rootList, LevelUtil.ROOT, levelAclModuleMap);
+        return rootList;
+    }
+
+    public void transformAclModuleTree(List<AclModuleLevelDto> dtoList, String level, Multimap<String, AclModuleLevelDto> levelAclModuleMap) {
+        for (AclModuleLevelDto dto : dtoList) {
+            String nextLevel = LevelUtil.calculateLevel(level, dto.getId());
+            List<AclModuleLevelDto> tempList = (List<AclModuleLevelDto>) levelAclModuleMap.get(nextLevel);
+            if (CollectionUtils.isNotEmpty(tempList)) {
+                tempList.sort(aclModuleSeqComparator);
+                dto.setAclModuleList(tempList);
+                transformAclModuleTree(tempList, nextLevel, levelAclModuleMap);
+            }
+        }
+    }
+
+    private static final Comparator<AclModuleLevelDto> aclModuleSeqComparator = Comparator.comparingInt(SysAclModule::getSeq);
+
+
+
 }
