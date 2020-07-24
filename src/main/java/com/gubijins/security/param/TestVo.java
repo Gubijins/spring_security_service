@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class TestVo {
 
-    @NotBlank
+    @NotNull
     private String msg;
 
     @NotNull(message = "id不可以为空")
