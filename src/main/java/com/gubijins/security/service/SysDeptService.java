@@ -2,12 +2,14 @@ package com.gubijins.security.service;
 
 import com.google.common.base.Preconditions;
 
+import com.gubijins.security.config.RequestHolder;
 import com.gubijins.security.exception.ParamException;
 import com.gubijins.security.mapper.SysDeptMapper;
 import com.gubijins.security.mapper.SysUserMapper;
 import com.gubijins.security.model.SysDept;
 import com.gubijins.security.param.DeptParam;
 import com.gubijins.security.util.BeanValidator;
+import com.gubijins.security.util.IpUtil;
 import com.gubijins.security.util.LevelUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,9 @@ public class SysDeptService {
                 .seq(param.getSeq()).remark(param.getRemark()).build();
 
         dept.setLevel(LevelUtil.calculateLevel(getLevel(param.getParentId()), param.getParentId()));
-        //TODO 登录之后确定操作者和操作ip
-        dept.setOperator("System");
-        dept.setOperateIp("127.0.0.1");
+        //登录之后确定操作者和操作ip
+        dept.setOperator(RequestHolder.getCurrentUser().getUsername());
+        dept.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         dept.setOperateTime(new Date());
         sysDeptMapper.insertSelective(dept);
     }
@@ -56,9 +58,9 @@ public class SysDeptService {
         SysDept after = SysDept.builder().id(param.getId()).name(param.getName()).parentId(param.getParentId())
                 .seq(param.getSeq()).remark(param.getRemark()).build();
         after.setLevel(LevelUtil.calculateLevel(getLevel(param.getParentId()), param.getParentId()));
-        //todo
-        after.setOperator("System");
-        after.setOperateIp("127.0.0.1");
+        //登录之后确定操作者和操作ip
+        after.setOperator(RequestHolder.getCurrentUser().getUsername());
+        after.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         after.setOperateTime(new Date());
 
         updateWithChild(before, after);

@@ -3,11 +3,13 @@ package com.gubijins.security.service;
 import com.google.common.base.Preconditions;
 import com.gubijins.security.beans.PageQuery;
 import com.gubijins.security.beans.PageResult;
+import com.gubijins.security.config.RequestHolder;
 import com.gubijins.security.exception.ParamException;
 import com.gubijins.security.mapper.SysUserMapper;
 import com.gubijins.security.model.SysUser;
 import com.gubijins.security.param.UserParam;
 import com.gubijins.security.util.BeanValidator;
+import com.gubijins.security.util.IpUtil;
 import com.gubijins.security.util.MD5Util;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +35,13 @@ public class SysUserService {
         String encryptedPassword = MD5Util.encrypt(password);
         SysUser user = SysUser.builder().username(param.getUsername()).telephone(param.getTelephone()).mail(param.getMail())
                 .password(encryptedPassword).deptId(param.getDeptId()).status(param.getStatus()).remark(param.getRemark()).build();
-        user.setOperator("System");//TODO
-        user.setOperateIp("127.0.0.1");//TODO
+        //登录之后确定操作者和操作ip
+        user.setOperator(RequestHolder.getCurrentUser().getUsername());
+        user.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         user.setOperateTime(new Date());
+        //TODO send email
         sysUserMapper.insertSelective(user);
+
         //sysLogService.saveUserLog(null, user);
     }
 
@@ -52,8 +57,9 @@ public class SysUserService {
         Preconditions.checkNotNull(before, "待更新的用户不存在");
         SysUser after = SysUser.builder().id(param.getId()).username(param.getUsername()).telephone(param.getTelephone()).mail(param.getMail())
                 .deptId(param.getDeptId()).status(param.getStatus()).remark(param.getRemark()).build();
-        after.setOperator("System");//TODO
-        after.setOperateIp("127.0.0.1");//TODO
+        //登录之后确定操作者和操作ip
+        after.setOperator(RequestHolder.getCurrentUser().getUsername());
+        after.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         after.setOperateTime(new Date());
         sysUserMapper.updateByPrimaryKeySelective(after);
         //sysLogService.saveUserLog(before, after);

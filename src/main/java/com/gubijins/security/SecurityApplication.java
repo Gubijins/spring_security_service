@@ -1,8 +1,10 @@
 package com.gubijins.security;
 
+import com.gubijins.security.config.LoginFilter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
@@ -20,5 +22,15 @@ public class SecurityApplication {
         resolver.setPrefix("/WEB-INF/views/");
         resolver.setSuffix(".jsp");
         return resolver;
+    }
+
+    //拦截器的配置
+    @Bean
+    public FilterRegistrationBean<LoginFilter> loginFilter(){
+        FilterRegistrationBean<LoginFilter> registrationBean=new FilterRegistrationBean<>(new LoginFilter());
+        //拦截需要判断是否登录的界面
+        registrationBean.addUrlPatterns("/sys/*");
+        registrationBean.addUrlPatterns("/admin/*");
+        return registrationBean;
     }
 }
