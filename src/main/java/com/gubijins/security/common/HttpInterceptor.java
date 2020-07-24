@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+/**
+ * Http请求前后监听工具
+ */
 @Slf4j
 @Component
 public class HttpInterceptor extends HandlerInterceptorAdapter {
@@ -35,8 +38,6 @@ public class HttpInterceptor extends HandlerInterceptorAdapter {
         long start = (Long) request.getAttribute(START_TIME);
         long end = System.currentTimeMillis();
         log.info("request finished. url:{}, cost:{}", url, end - start);
-//        removeThreadLocalInfo();
-
     }
 
     @Override
@@ -45,14 +46,5 @@ public class HttpInterceptor extends HandlerInterceptorAdapter {
         long start = (Long) request.getAttribute(START_TIME);
         long end = System.currentTimeMillis();
         log.info("request completed. url:{}, cost:{}", url, end - start);
-//
-//        removeThreadLocalInfo();
-//        String url = request.getRequestURI().toString();
-//        Map parameterMap = request.getParameterMap();
-//        log.info("request exception. url:{}, params:{}", url, JsonMapper.obj2String(parameterMap));
     }
-
-//    public void removeThreadLocalInfo() {
-//        RequestHolder.remove();;
-//    }
 }
