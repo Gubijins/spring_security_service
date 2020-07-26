@@ -66,13 +66,13 @@ public class SysUserService {
     }
 
     public boolean checkEmailExist(String mail, Integer userId) {
-        //return sysUserMapper.countByMail(mail, userId) > 0;
-        return false;
+        return sysUserMapper.countByMail(mail, userId) > 0;
+//        return false;
     }
 
     public boolean checkTelephoneExist(String telephone, Integer userId) {
-        //return sysUserMapper.countByTelephone(telephone, userId) > 0;
-        return false;
+        return sysUserMapper.countByTelephone(telephone, userId) > 0;
+//        return false;
     }
 
     public SysUser findByKeyword(String keyword) {
@@ -91,7 +91,7 @@ public class SysUserService {
 
     }
 
-//    public List<SysUser> getAll() {
-//        return sysUserMapper.getAll();
-//    }
+    public List<SysUser> getAll() {
+        return sysUserMapper.getAll();
+    }
 }
