@@ -204,4 +204,22 @@ public class SysTreeService {
     private static final Comparator<AclDto> aclSeqComparator = Comparator.comparingInt(SysAcl::getSeq);
 
 
+    /**
+     * 获取用户所拥有的权限点的树形结构
+     * @param userId
+     * @return
+     */
+    public List<AclModuleLevelDto> userAclTree(int userId) {
+        List<SysAcl> userAclList = sysCoreService.getUserAclList(userId);
+        List<AclDto> aclDtoList = Lists.newArrayList();
+        for (SysAcl acl : userAclList) {
+            AclDto dto = AclDto.adapt(acl);
+            dto.setHasAcl(true);
+            dto.setChecked(true);
+            aclDtoList.add(dto);
+        }
+        return aclListToTree(aclDtoList);
+    }
+
+
 }

@@ -6,8 +6,10 @@ import com.gubijins.security.beans.PageResult;
 import com.gubijins.security.common.JsonData;
 import com.gubijins.security.model.SysUser;
 import com.gubijins.security.param.UserParam;
+import com.gubijins.security.service.SysRoleService;
 import com.gubijins.security.service.SysTreeService;
 import com.gubijins.security.service.SysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +27,8 @@ public class SysUserController {
     private SysUserService sysUserService;
     @Resource
     private SysTreeService sysTreeService;
+    @Autowired
+    private SysRoleService sysRoleService;
 
 //    @RequestMapping("/noAuth.page")
 //    public ModelAndView noAuth() {
@@ -52,12 +56,12 @@ public class SysUserController {
         return JsonData.success(result);
     }
 
-//    @RequestMapping("/acls.json")
-//    @ResponseBody
-//    public JsonData acls(@RequestParam("userId") int userId) {
-//        Map<String, Object> map = Maps.newHashMap();
-//        map.put("acls", sysTreeService.userAclTree(userId));
-//        map.put("roles", sysRoleService.getRoleListByUserId(userId));
-//        return JsonData.success(map);
-//    }
+    @RequestMapping("/acls.json")
+    @ResponseBody
+    public JsonData acls(@RequestParam("userId") int userId) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("acls", sysTreeService.userAclTree(userId));
+        map.put("roles", sysRoleService.getRoleListByUserId(userId));
+        return JsonData.success(map);
+    }
 }

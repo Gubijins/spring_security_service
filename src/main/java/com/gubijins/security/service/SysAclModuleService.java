@@ -94,14 +94,13 @@ public class SysAclModuleService {
     public void delete(int aclModuleId) {
         SysAclModule aclModule = sysAclModuleMapper.selectByPrimaryKey(aclModuleId);
         Preconditions.checkNotNull(aclModule, "待删除的权限模块不存在，无法删除");
-        //TODO 删除之前要判断能否删除
-//        if(sysAclModuleMapper.countByParentId(aclModule.getId()) > 0) {
-//            throw new ParamException("当前模块下面有子模块，无法删除");
-//        }
-//        if (sysAclMapper.countByAclModuleId(aclModule.getId()) > 0) {
-//            throw new ParamException("当前模块下面有用户，无法删除");
-//        }
-//        sysAclModuleMapper.deleteByPrimaryKey(aclModuleId);
+        if(sysAclModuleMapper.countByParentId(aclModule.getId()) > 0) {
+            throw new ParamException("当前模块下面有子模块，无法删除");
+        }
+        if (sysAclMapper.countByAclModuleId(aclModule.getId()) > 0) {
+            throw new ParamException("当前模块下面有权限，无法删除");
+        }
+        sysAclModuleMapper.deleteByPrimaryKey(aclModuleId);
     }
 
 }
