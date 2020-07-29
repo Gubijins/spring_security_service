@@ -30,10 +30,10 @@ public class SysUserController {
     @Autowired
     private SysRoleService sysRoleService;
 
-//    @RequestMapping("/noAuth.page")
-//    public ModelAndView noAuth() {
-//        return new ModelAndView("noAuth");
-//    }
+    @RequestMapping("/noAuth.page")
+    public ModelAndView noAuth() {
+        return new ModelAndView("noAuth");
+    }
 
     @RequestMapping("/save.json")
     @ResponseBody

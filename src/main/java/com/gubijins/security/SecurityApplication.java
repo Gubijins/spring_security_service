@@ -1,5 +1,6 @@
 package com.gubijins.security;
 
+import com.gubijins.security.config.AclControlFilter;
 import com.gubijins.security.config.LoginFilter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -24,7 +25,7 @@ public class SecurityApplication {
         return resolver;
     }
 
-    //拦截器的配置
+    //login_filter过滤器的配置
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilter(){
         FilterRegistrationBean<LoginFilter> registrationBean=new FilterRegistrationBean<>(new LoginFilter());
@@ -33,4 +34,18 @@ public class SecurityApplication {
         registrationBean.addUrlPatterns("/admin/*");
         return registrationBean;
     }
+
+    //acl_controller_filter过滤器的配置
+    @Bean
+    public FilterRegistrationBean<AclControlFilter> aclControlFilter(){
+        FilterRegistrationBean<AclControlFilter> registrationBean=new FilterRegistrationBean<>(new AclControlFilter());
+        //拦截需要判断是否登录的界面
+//        registrationBean.addUrlPatterns("/sys/*");
+//        registrationBean.addUrlPatterns("/admin/*");
+        return registrationBean;
+    }
+
+
+
+
 }
