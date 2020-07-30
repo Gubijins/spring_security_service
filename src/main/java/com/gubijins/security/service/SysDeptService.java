@@ -26,6 +26,8 @@ public class SysDeptService {
     private SysDeptMapper sysDeptMapper;
     @Resource
     private SysUserMapper sysUserMapper;
+    @Resource
+    private SysLogService sysLogService;
 
     public void save(DeptParam param) {
         BeanValidator.check(param);
@@ -41,6 +43,7 @@ public class SysDeptService {
         dept.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
         dept.setOperateTime(new Date());
         sysDeptMapper.insertSelective(dept);
+        sysLogService.saveDeptLog(null, dept);
     }
 
     @Transactional
@@ -64,6 +67,7 @@ public class SysDeptService {
         after.setOperateTime(new Date());
 
         updateWithChild(before, after);
+        sysLogService.saveDeptLog(before, after);
     }
 
     @Transactional

@@ -39,9 +39,9 @@ public class SecurityApplication {
     @Bean
     public FilterRegistrationBean<AclControlFilter> aclControlFilter(){
         FilterRegistrationBean<AclControlFilter> registrationBean=new FilterRegistrationBean<>(new AclControlFilter());
-        //拦截需要判断是否登录的界面
-//        registrationBean.addUrlPatterns("/sys/*");
-//        registrationBean.addUrlPatterns("/admin/*");
+        //拦截需要判断的界面
+        registrationBean.addUrlPatterns("/sys/*");
+        registrationBean.addUrlPatterns("/admin/*");
         return registrationBean;
     }
 

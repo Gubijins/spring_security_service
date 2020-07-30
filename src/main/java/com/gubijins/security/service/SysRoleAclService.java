@@ -2,11 +2,14 @@ package com.gubijins.security.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.gubijins.security.beans.LogType;
 import com.gubijins.security.config.RequestHolder;
 import com.gubijins.security.mapper.SysLogMapper;
 import com.gubijins.security.mapper.SysRoleAclMapper;
+import com.gubijins.security.model.SysLogWithBLOBs;
 import com.gubijins.security.model.SysRoleAcl;
 import com.gubijins.security.util.IpUtil;
+import com.gubijins.security.util.JsonMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,8 @@ public class SysRoleAclService {
 
     @Resource
     private SysRoleAclMapper sysRoleAclMapper;
+    @Resource
+    private SysLogMapper sysLogMapper;
 
     @Transactional
     public void changeRoleAcls(Integer roleId, List<Integer> aclIdList) {
@@ -34,6 +39,7 @@ public class SysRoleAclService {
             }
         }
         updateRoleAcls(roleId, aclIdList);
+        saveRoleAclLog(roleId, originAclIdList, aclIdList);
     }
 
     @Transactional
@@ -50,6 +56,20 @@ public class SysRoleAclService {
             roleAclList.add(roleAcl);
         }
         sysRoleAclMapper.batchInsert(roleAclList);
+    }
+
+
+    private void saveRoleAclLog(int roleId, List<Integer> before, List<Integer> after) {
+        SysLogWithBLOBs sysLog = new SysLogWithBLOBs();
+        sysLog.setType(LogType.TYPE_ROLE_ACL);
+        sysLog.setTargetId(roleId);
+        sysLog.setOldValue(before == null ? "" : JsonMapper.obj2String(before));
+        sysLog.setNewValue(after == null ? "" : JsonMapper.obj2String(after));
+        sysLog.setOperator(RequestHolder.getCurrentUser().getUsername());
+        sysLog.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
+        sysLog.setOperateTime(new Date());
+        sysLog.setStatus(1);
+        sysLogMapper.insertSelective(sysLog);
     }
 
 }

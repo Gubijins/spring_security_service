@@ -2,12 +2,16 @@ package com.gubijins.security.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.gubijins.security.beans.LogType;
 import com.gubijins.security.config.RequestHolder;
+import com.gubijins.security.mapper.SysLogMapper;
 import com.gubijins.security.mapper.SysRoleUserMapper;
 import com.gubijins.security.mapper.SysUserMapper;
+import com.gubijins.security.model.SysLogWithBLOBs;
 import com.gubijins.security.model.SysRoleUser;
 import com.gubijins.security.model.SysUser;
 import com.gubijins.security.util.IpUtil;
+import com.gubijins.security.util.JsonMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,9 @@ public class SysRoleUserService {
     private SysRoleUserMapper sysRoleUserMapper;
     @Resource
     private SysUserMapper sysUserMapper;
+    @Resource
+    private SysLogMapper sysLogMapper;
+
 
     public List<SysUser> getListByRoleId(int roleId) {
         List<Integer> userIdList = sysRoleUserMapper.getUserIdListByRoleId(roleId);
@@ -45,6 +52,7 @@ public class SysRoleUserService {
             }
         }
         updateRoleUsers(roleId, userIdList);
+        saveRoleUserLog(roleId, originUserIdList, userIdList);
     }
 
     @Transactional
@@ -61,5 +69,25 @@ public class SysRoleUserService {
             roleUserList.add(roleUser);
         }
         sysRoleUserMapper.batchInsert(roleUserList);
+    }
+
+
+    /**
+     * 避免循环引用注入
+     * @param roleId
+     * @param before
+     * @param after
+     */
+    private void saveRoleUserLog(int roleId, List<Integer> before, List<Integer> after) {
+        SysLogWithBLOBs sysLog = new SysLogWithBLOBs();
+        sysLog.setType(LogType.TYPE_ROLE_USER);
+        sysLog.setTargetId(roleId);
+        sysLog.setOldValue(before == null ? "" : JsonMapper.obj2String(before));
+        sysLog.setNewValue(after == null ? "" : JsonMapper.obj2String(after));
+        sysLog.setOperator(RequestHolder.getCurrentUser().getUsername());
+        sysLog.setOperateIp(IpUtil.getRemoteIp(RequestHolder.getCurrentRequest()));
+        sysLog.setOperateTime(new Date());
+        sysLog.setStatus(1);
+        sysLogMapper.insertSelective(sysLog);
     }
 }
